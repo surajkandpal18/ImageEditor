@@ -11,6 +11,7 @@ import RotateLeftIcon from '@material-ui/icons/RotateLeft';
 import RotateRightIcon from '@material-ui/icons/RotateRight';
 import RestoreIcon from '@material-ui/icons/Restore';
 import Divider from '@material-ui/core/Divider';
+import Slider from '@material-ui/core/Slider';
 
 
 const useStyle=makeStyles(theme=>({
@@ -72,19 +73,29 @@ imagetoBeEdited:{
 },
 
 imagePopupContainer:{
-  width:"100%",
-  height:"100%",
+  width:"100vw",
+  height:"100vh",
   
 },
 menuItems:{
   backgroundColor:"black",
   width:"100%"
 },
+saveCloseButton:{
+  backgroundColor:"black"
+},
 
 myButtons:{
   backgroundColor:'orange',
   color:'white',
   marginTop:'1em',
+},
+brightnessSlider:{
+ width:'10em'
+},
+
+brightnessSliderContainer:{
+  display:"none",
 }
 
 
@@ -93,22 +104,62 @@ myButtons:{
 const EditorPopup=(props)=>{
   const classes=useStyle();
 const theme=useTheme();
+const [value, setValue] = React.useState(0);
 
 const matchesXS=useMediaQuery(theme.breakpoints.down('sm'));
 
     const handleBrightness=(event)=>{
-    event.target.closest('button').parentElement.parentElement.previousSibling.childNodes[0].style.filter="brightness(50%)"
+  //  event.target.closest('button').parentElement.parentElement.previousSibling.childNodes[0].style.filter=`brightness(${value})`
+console.log(document.getElementById("brightnessSliderContainer").style.display)
+  if(document.getElementById("brightnessSliderContainer").style.display===''||document.getElementById("brightnessSliderContainer").style.display==='none')
+    {document.getElementById("brightnessSliderContainer").style.display='block'}
+  else{
+      document.getElementById("brightnessSliderContainer").style.display='none'
     }
+  }
 
   const handleEditPopupClose=(event)=>{
      document.getElementsByClassName("imgPopupContainer")[0].style.display="none"
   }
 
+
+  const handleSliderChange = (event, newValue) => {
+    setValue(newValue);
+    document.getElementById("imagetoBeEdited").style.filter=`brightness(${value}%)`
+  };
+
+  const valuetext=(value)=> {
+  return `${value}%`;
+}
+
+const brightnessSlider=(
+        <Grid className={classes.brightnessSliderContainer} id="brightnessSliderContainer" item xs>
+
+          <Slider
+          
+          className={classes.brightnessSlider}
+            value={typeof value === 'number' ? value : 0}
+             getAriaValueText={valuetext}
+            onChange={handleSliderChange}
+            aria-labelledby="input-slider"
+            valueLabelDisplay="auto"
+            step={10}
+            max={150}
+          />
+
+        </Grid>
+  )
+
 return (
     <Grid container direction="column" justify="center" className="imgPopupContainer" style={{display:"none",top:0,backgroundColor:'black',position:'absolute',zIndex:3,width:"100%",height:"100%"}}>
     <Grid item >
-          <img className={classes.imagetoBeEdited} src={props.myblobfile} alt="imagetobeedited" />
+          <img className={classes.imagetoBeEdited} id='imagetoBeEdited' src={props.myblobfile} alt="imagetobeedited" />
+          
     </Grid>
+    
+         
+          {brightnessSlider}
+    
     <Grid item container direction="row" justify="center" spacing={matchesXS?1:2} className={classes.menuItems} >
       <Grid item> <Button className={classes.myButtons} size={matchesXS?"small":'medium'} variant="contained"><RestoreIcon/></Button></Grid>
       <Grid item><Button className={classes.myButtons} size={matchesXS?"small":'medium'} variant="contained"><RotateLeftIcon/></Button></Grid>
