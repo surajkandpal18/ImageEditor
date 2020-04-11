@@ -1,9 +1,16 @@
 import React,{useState} from 'react'
 import AddCircleIcon from '@material-ui/icons/AddCircle';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles,useTheme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import Grid from '@material-ui/core/Grid'
-import Button from '@material-ui/core/Button'
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import Grid from '@material-ui/core/Grid';
+import Button from '@material-ui/core/Button';
+import CropIcon from '@material-ui/icons/Crop';
+import Brightness5Icon from '@material-ui/icons/Brightness5';
+import RotateLeftIcon from '@material-ui/icons/RotateLeft';
+import RotateRightIcon from '@material-ui/icons/RotateRight';
+import RestoreIcon from '@material-ui/icons/Restore';
+import Divider from '@material-ui/core/Divider';
 
 
 const useStyle=makeStyles(theme=>({
@@ -47,17 +54,93 @@ imgPreview:{
 	},
 	
 	
+},
+
+imagetoBeEdited:{
+  height:'40em',
+  width:'30em',
+ 
+  marginTop:'3em',
+ 
+  [theme.breakpoints.down('xs')]:{
+    height:'30em',
+  width:'20em',
+  
+  marginTop:'2em',
+  },
+  
+},
+
+imagePopupContainer:{
+  width:"100%",
+  height:"100%",
+  
+},
+menuItems:{
+  backgroundColor:"black",
+  width:"100%"
+},
+
+myButtons:{
+  backgroundColor:'orange',
+  color:'white',
+  marginTop:'1em',
 }
 
 
 }))
+
+const EditorPopup=(props)=>{
+  const classes=useStyle();
+const theme=useTheme();
+
+const matchesXS=useMediaQuery(theme.breakpoints.down('sm'));
+
+    const handleBrightness=(event)=>{
+    event.target.closest('button').parentElement.parentElement.previousSibling.childNodes[0].style.filter="brightness(50%)"
+    }
+
+  const handleEditPopupClose=(event)=>{
+     document.getElementsByClassName("imgPopupContainer")[0].style.display="none"
+  }
+
+return (
+    <Grid container direction="column" justify="center" className="imgPopupContainer" style={{display:"none",top:0,backgroundColor:'black',position:'absolute',zIndex:3,width:"100%",height:"100%"}}>
+    <Grid item >
+          <img className={classes.imagetoBeEdited} src={props.myblobfile} alt="imagetobeedited" />
+    </Grid>
+    <Grid item container direction="row" justify="center" spacing={matchesXS?1:2} className={classes.menuItems} >
+      <Grid item> <Button className={classes.myButtons} size={matchesXS?"small":'medium'} variant="contained"><RestoreIcon/></Button></Grid>
+      <Grid item><Button className={classes.myButtons} size={matchesXS?"small":'medium'} variant="contained"><RotateLeftIcon/></Button></Grid>
+     <Grid item> <Button className={classes.myButtons} size={matchesXS?"small":'medium'} variant="contained"><RotateRightIcon/></Button></Grid>
+      <Grid item><Button className={classes.myButtons} size={matchesXS?"small":'medium'} variant="contained"><CropIcon/></Button></Grid>
+     <Grid item> <Button className={classes.myButtons} size={matchesXS?"small":'medium'} variant="contained" onClick={handleBrightness}><Brightness5Icon/></Button></Grid>
+    </Grid>
+    <Grid item container direction="row" spacing={3} justify="center" className={classes.saveCloseButton} >
+      <Grid item>
+          <Button className={classes.myButtons} variant='contained'>Save</Button>
+      </Grid>
+      <Grid item>
+          <Button className={classes.myButtons} variant='contained' onClick={handleEditPopupClose}>Close</Button>
+      </Grid>
+    </Grid>
+    </Grid>
+
+
+
+  )
+
+}
 
 
 export default function ImageEditor(props){
 
 const classes=useStyle();
 const [myfile,setFile]=useState([]);
+const theme=useTheme();
 const [myblobfile,setblobFile]=useState(0);
+const matchesXS=useMediaQuery(theme.breakpoints.down('xs'));
+
 
 	
 
@@ -101,6 +184,11 @@ const handleChange=(event) =>{
 
   }
 
+  const handleEditPopup=(event)=>{
+
+    document.getElementsByClassName("imgPopupContainer")[0].style.display="block"
+  }
+
 return (
 
 		<div>
@@ -115,16 +203,17 @@ return (
 						<Grid item >
 							<img className={classes.imgPreview} src={myblobfile}/>
 						</Grid>
-						<Grid container item direction="row" justify='center' spacing={2}>
+						<Grid container item direction="row" justify='center' spacing={matchesXS?1:2}>
 							<Grid item>
-								<Button variant='outlined' size='medium' >X</Button>
+								<Button variant='outlined' size={matchesXS?"small":'medium'} >X</Button>
 							</Grid>
 							<Grid item>
-								<Button variant='outlined' size='medium' >Edit</Button>
+								<Button variant='outlined' size={matchesXS?"small":'medium'} onClick={handleEditPopup}>Edit</Button>
 							</Grid>
 						</Grid>
 					</Grid>
 				</Grid>
+        <EditorPopup myblobfile={myblobfile}/>
         </div>
 
 	)
